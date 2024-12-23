@@ -4,6 +4,7 @@ import ee.mihkel.film_rental.entity.Film;
 import ee.mihkel.film_rental.entity.Rental;
 import ee.mihkel.film_rental.repository.FilmRepository;
 import ee.mihkel.film_rental.repository.RentalRepository;
+import ee.mihkel.film_rental.service.RentalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +22,13 @@ public class RentalController {
     @Autowired
     RentalRepository rentalRepository;
 
-    @Autowired
+    @Autowired // ---> saan @Autowired teha, kui on klassil extends JpaRepository
     FilmRepository filmRepository;
+
+    @Autowired // ---> saan @Autowired teha, kui on klassil @Service
+    RentalService rentalService;
+
+    // Controlleril võiks olla ainult @Mapping funktsioonid
 
     @PostMapping("start-rental") // tuleb saata listi filmidest, ID ja INITIALRENTDAYS igaühel
     public List<Rental> startRental(@RequestBody List<Film> films) {
@@ -49,42 +55,13 @@ public class RentalController {
             film.setFinalRentDays(0); // selle pean ka panema, muidu äkki kirjutab front-end muu arvu (aga andmebaasis juba on 0)
             film.setAvailable(false); // seda muudan
             film.setRental(rentalWithId); // seda muudan
-            sum = sum + calculateSum(film);
+            sum = sum + rentalService.calculateSum(film);
             filmRepository.save(film); // tehakse küll .save(), aga tegelikult toimub update
         }
         rental.setSum(sum);
         rentalRepository.save(rental);
 
         return rentalRepository.findAll();
-    }
-
-    private int calculateSum(Film film) {
-        int basic_price = 3;
-        int premium_price = 4;
-        int sum = 0; // seda suurendame
-//        for (Film film: films) {
-            switch (film.getType()) {
-                //6 päeva: 3 + 3*1 = 6€
-                case "Old" -> {
-                    if (film.getInitialRentDays() <= 5) {
-                        sum = sum + basic_price;
-                    } else {      // esimesed 5         iga ülejäänud päev
-                        sum = sum + basic_price + basic_price * (film.getInitialRentDays() - 5);
-                    }
-                }
-                //6 päeva: 3 + 3*3 = 12€
-                case "Regular" -> {
-                    if (film.getInitialRentDays() <= 3) {
-                        sum = sum + basic_price;
-                    } else {
-                        sum = sum + basic_price + basic_price * (film.getInitialRentDays() - 3);
-                    }
-                }
-                //6 päeva: 6*4 = 24€
-                case "New" -> sum = sum + film.getInitialRentDays() * premium_price;
-            }
-//        }
-        return sum;
     }
 
     // localhost:8080/end-rental?filmId=4&rentDays=10
@@ -96,7 +73,7 @@ public class RentalController {
         Rental rental = rentalRepository.findById(film.getRental().getId()).get();
         rental.setLastChangeDate(new Date());
         if (rentDays > film.getInitialRentDays()) {
-            rental.setLateFee(rental.getLateFee() + calculateLateFee(film, rentDays));
+            rental.setLateFee(rental.getLateFee() + rentalService.calculateLateFee(film, rentDays));
         }
 
         film.setInitialRentDays(0);
@@ -108,13 +85,5 @@ public class RentalController {
         return rentalRepository.findAll();
     }
 
-    private int calculateLateFee(Film film, int rentDays) {
-        if (film.getType().equals("New")) {
-            return (rentDays - film.getInitialRentDays()) * 4;
-        } else if (film.getType().equals("Old") || film.getType().equals("Regular")) {
-            return (rentDays - film.getInitialRentDays()) * 3;
-        } else {
-            return 0;
-        }
-    }
+
 }
