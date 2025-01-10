@@ -3,16 +3,28 @@ package ee.mihkel.webshop.controller;
 import ee.mihkel.webshop.entity.Product;
 import ee.mihkel.webshop.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
+
+    // localhost:8080/public-products?categoryId=0
+    @GetMapping("public-products")
+    public Page<Product> getPublicProducts(Pageable pageable, @RequestParam Long categoryId) {
+        if (categoryId == 0) {
+            return productRepository.findAll(pageable);
+        } else {
+            return productRepository.findByCategory_IdOrderByIdAsc(categoryId, pageable);
+        }
+    }
 
     @GetMapping("products")
     public List<Product> getProducts() {

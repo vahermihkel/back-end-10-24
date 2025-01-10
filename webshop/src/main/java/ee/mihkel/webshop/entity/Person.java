@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 //@Getter
 @Setter
@@ -24,4 +25,6 @@ public class Person {
     public String lastName;
     public String phone;
     public String email;
+    @ColumnDefault("false")
+    public boolean admin;
 }

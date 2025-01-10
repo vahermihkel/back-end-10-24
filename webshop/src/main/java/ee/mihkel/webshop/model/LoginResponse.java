@@ -10,6 +10,7 @@ import java.util.Date;
 public class LoginResponse {
     String token;
     Date expiration;
+    boolean admin;
 
     public String getToken() {
         return token;
@@ -25,5 +26,13 @@ public class LoginResponse {
 
     public void setExpiration(Date expiration) {
         this.expiration = expiration;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }
