@@ -1,16 +1,14 @@
 package ee.mihkel.webshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 public class OrderRow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

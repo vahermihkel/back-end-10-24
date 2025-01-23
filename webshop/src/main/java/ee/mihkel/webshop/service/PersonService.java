@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -24,6 +25,9 @@ public class PersonService {
     @Autowired
     PersonRepository personRepository;
 
+    @Value("${auth.secret-key}")
+    String secretKey;
+
     public SignupResponse checkIfAllCorrect(Person person, SignupResponse response) {
         if (person.email == null || person.email.isEmpty()) {
             response.setSuccessful(false);
@@ -38,6 +42,11 @@ public class PersonService {
         if (person.username == null || person.username.isEmpty()) {
             response.setSuccessful(false);
             response.setMessage("Kasutajanimi puudub!");
+            return response;
+        }
+        if (person.password == null || person.password.isEmpty()) {
+            response.setSuccessful(false);
+            response.setMessage("Parool puudub!");
             return response;
         }
         if (personRepository.findByUsername(person.username) != null) {
@@ -83,7 +92,7 @@ public class PersonService {
         // 20 tähendab 20 minutit
         Date expirationDate = new Date((new Date()).getTime() + 20 * 60 * 1000);
 
-        SecretKey signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("Ogm23UPIerQmWx1bbNCSzDX8gtjldwnHjNT+aNu6yhc="));
+        SecretKey signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 
         Map<String, String> claims = new HashMap<>();
         claims.put("id", dbPerson.id.toString());
@@ -103,7 +112,7 @@ public class PersonService {
 
     public Person findPersonByToken(String token) {
 
-        SecretKey signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("Ogm23UPIerQmWx1bbNCSzDX8gtjldwnHjNT+aNu6yhc="));
+        SecretKey signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
 
         Object id = Jwts.parser()
                 .verifyWith(signingKey)

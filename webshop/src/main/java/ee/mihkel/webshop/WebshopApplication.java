@@ -26,5 +26,5 @@ public class WebshopApplication {
 
 // 24.12/25.12
 // 30.12/02.01
-// N 09.01
-// P 26.01 --> 10.00-11.30 poolik päev
+// K 22.01
+// K 29.01 --> 10.00-11.30 poolik päev

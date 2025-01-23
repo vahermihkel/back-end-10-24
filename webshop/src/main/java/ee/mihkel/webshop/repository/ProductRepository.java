@@ -11,6 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findByActiveTrueOrderByIdAsc(Pageable pageable);
 
-    Page<Product> findByCategory_IdOrderByIdAsc(Long id, Pageable pageable);
+    Page<Product> findByCategory_Id(Long id, Pageable pageable);
 
 }

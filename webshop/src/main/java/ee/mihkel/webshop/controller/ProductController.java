@@ -15,14 +15,16 @@ public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
-
-    // localhost:8080/public-products?categoryId=0
+                                // categoryId --> lisame meie
+    //      page, size, sort   parameetrid lisab Pageable automaatikaga
+    // localhost:8080/public-products?categoryId=0&page=0&size=2&sort=title,asc
+    // localhost:8080/public-products?categoryId=0&page=0&size=2&sort=price,desc
     @GetMapping("public-products")
     public Page<Product> getPublicProducts(Pageable pageable, @RequestParam Long categoryId) {
         if (categoryId == 0) {
             return productRepository.findAll(pageable);
         } else {
-            return productRepository.findByCategory_IdOrderByIdAsc(categoryId, pageable);
+            return productRepository.findByCategory_Id(categoryId, pageable);
         }
     }
 

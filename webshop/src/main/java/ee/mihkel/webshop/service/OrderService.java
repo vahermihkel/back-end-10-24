@@ -42,4 +42,8 @@ public class OrderService {
         }
         return sum;
     }
+
+    public List<Order> getPersonOrders(Long id) {
+        return orderRepository.findByOrderer_Id(id);
+    }
 }
